@@ -1,0 +1,13 @@
+body {
+    padding: 0;
+    overflow: hidden;
+    font-family: helvetica, arial, sans-serif;
+}
+
+#map {
+    position: absolute;
+    right: 0px;
+    left: 0px;
+    height: 100%;
+    top: 0;
+}

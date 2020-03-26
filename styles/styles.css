@@ -11,18 +11,20 @@ body {
     height: 100%;
     top: 0;
 }
+
 .title{
-    position: absolute;
     z-index: 10;
-    padding:6px 8px;
+    padding: 6px 8px;
     background: white;
     background: rgba(255,255,255,0.8);
     border-radius: 5px;
-    font: 14px/16px Arial, Helvetica, sans-serif;
+    /* font: 14px/16px Arial, Helvetica, sans-serif; */
 }
-h3{
+
+h1{
     color: #777;
 }
+
 .info {
     padding: 6px 8px;
     font: 20px/22px Arial, Helvetica, sans-serif;
@@ -35,6 +37,7 @@ h3{
     margin: 0 0 5px;
     color: #777;
 }
+
 .legend {
     line-height: 20px;
     color: #555;
@@ -46,3 +49,11 @@ h3{
     margin-right: 8px;
     opacity: 0.7;
 }
+/* .filter{
+    z-index: 10;
+    padding: 6px 8px;
+    background: white;
+    background: rgba(255,255,255,0.8);
+    border-radius: 5px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+} */

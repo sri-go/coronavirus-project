@@ -1,3 +1,5 @@
+//This function downloads the CSV File data, processess it to GEOJSON, and then Filters it for the US Subsect, 
+//and finally adds it to the states js file
 var get_data = function (url) {
     var download = $.ajax({
         url: url

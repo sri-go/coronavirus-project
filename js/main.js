@@ -9,14 +9,18 @@
       var month = ((d.getMonth() + 1));
     }
     var month = ('0' + (d.getMonth() + 1));
-    var year = d.getFullYear();
-    var day = d.getDate();
+    var x = d.toString()
+    var date = x.split(' ');
+    var day = date[2];
+    day = (parseInt(day)-1);
+    day = ('0'+day);
+    var year = date[3];
     var dash = '-';
-    var data_day = day - 1;
+
     return {
       month,
       year,
-      data_day,
+      day,
       dash
     };
   };
@@ -25,9 +29,10 @@
   //utilizng ajax to fetch latest data from github repo
   var date = getDate();
   var url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/' +
-    date.month + date.dash + date.data_day + date.dash + date.year + '.csv';
+    date.month + date.dash + date.day + date.dash + date.year + '.csv';
   var featureGroup;
-  console.log(url)
+  var featureGroup2;
+
   //Color Scale for each of the different counts
   function getColor(d, style) {
     if (style === "Deaths") {
@@ -128,7 +133,7 @@
 
   title.onAdd = function (map) {
     var div = L.DomUtil.create('div', 'title');
-    div.innerHTML = '<h1>US Coronavirus Situation Map</h1><h3>Updated as of ' + date.month + date.dash + date.data_day + date.dash + date.year + '</h3>';
+    div.innerHTML = '<h1>US Coronavirus Situation Map</h1><h3>Updated as of ' + date.month + date.dash + date.day + date.dash + date.year + '</h3>';
     return div;
 
   };
@@ -247,5 +252,4 @@
         onEachFeature: eachFeatureFunction
       }).addTo(map);
     });
-    $('.leaflet-control-zoom').hide();
   });

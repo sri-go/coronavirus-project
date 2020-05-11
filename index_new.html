@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <!-- CSS Imports -->
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <script src="js/underscore.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/csv2geojson@5.1.1/csv2geojson.min.js"></script>
+  <script src="https://cdn.rawgit.com/Keyang/node-csvtojson/d41f44aa/browser/csvtojson.min.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v1.9.1/mapbox-gl.css" rel="stylesheet" />
+  <link href="styles/styles_new.css" rel="stylesheet" />
+  <script src="js/jquery-2.2.0.js"></script>
+  <script src="js/states.js"></script>
+  <script src="js/counties.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/getDate.js"></script>
+</head>
+<style>
+  .map-overlay {
+    font: 20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+  }
+
+  .map-overlay .map-overlay-inner {
+    background-color: #ffffffc2;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    padding: 10px;
+    margin-bottom: 10px;
+  }
+
+  .map-overlay-inner fieldset {
+    border: none;
+    padding: 0;
+    margin: 0 0 10px;
+  }
+
+  .map-overlay-inner fieldset:last-child {
+    margin: 0;
+  }
+
+  .map-overlay-inner select {
+    width: 100%;
+  }
+
+  .map-overlay-inner label {
+    display: block;
+    font-weight: bold;
+    /* margin: 0 0 5px; */
+  }
+
+  .map-overlay-inner button {
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    background-color: grey;
+    border: 3px solid tomato;
+  }
+
+  .map-overlay-inner button:focus {
+    outline: none;
+    background-color: grey;
+  }
+
+  .map-overlay-inner button:hover {
+    /* box-shadow: inset 0 0 0 3px rgba(0, 0, 0, 0.1); */
+  }
+
+  .layer .active {
+    background-color: aqua;
+  }
+
+  .covid-stats h1 {
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  .map-overlay-inner label {
+    font-weight: 300;
+  }
+
+  .legend {
+    background-color: #fff;
+    border-radius: 3px;
+    bottom: 30px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    padding: 10px;
+    position: absolute;
+    right: 10px;
+    z-index: 1;
+  }
+
+  .legend h4 {
+    margin: 0 0 10px;
+  }
+
+  .legend div span {
+    border-radius: 50%;
+    display: inline-block;
+    height: 10px;
+    margin-right: 5px;
+    width: 10px;
+  }
+</style>
+
+<body>
+  <!-- Map -->
+  <div id="map"></div>
+  <div class="map-overlay top">
+    <div class="map-overlay-inner">
+      <div class="covid-stats">
+      </div>
+      <fieldset>
+        <div style="display: flex; justify-content: flex-start; align-items: center;">
+          <label style="margin-right: 15px;">Select Style: </label>
+          <button id='layer'>Toggle Confirmed</button>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+  <div id="state-death-legend" class="legend">
+    <h4>Deaths</h4>
+    <div><span style="background-color: #99000d"></span>20,000</div>
+    <div><span style="background-color: #cb181d"></span>10,000</div>
+    <div><span style="background-color: #ef3b2c"></span>5,000</div>
+    <div><span style="background-color: #fb6a4a"></span>1,000</div>
+    <div><span style="background-color: #fc9272"></span>500</div>
+    <div><span style="background-color: #fcbba1"></span>100</div>
+    <div><span style="background-color: #fee0d2"></span>50</div>
+    <div><span style="background-color: #fff5f0"></span>0</div>
+  </div>
+  <div id="state-confirmed-legend" class="legend" style="display: none;">
+    <h4>Confirmed</h4>
+    <div><span style="background-color: #084594"></span>100,000</div>
+    <div><span style="background-color: #2171b5"></span>50,000</div>
+    <div><span style="background-color: #4292c6"></span>10,000</div>
+    <div><span style="background-color: #6baed6"></span>5,000</div>
+    <div><span style="background-color: #9ecae1"></span>1,000</div>
+    <div><span style="background-color: #c6dbef"></span>500</div>
+    <div><span style="background-color: #deebf7"></span>100</div>
+    <div><span style="background-color: #f7fbff"></span>0</div>
+  </div>
+
+  <div id="county-death-legend" class="legend" style="display: none;">
+    <h4>Deaths</h4>
+    <div><span style="background-color: #99000d"></span>5,000</div>
+    <div><span style="background-color: #cb181d"></span>2,500</div>
+    <div><span style="background-color: #ef3b2c"></span>1,500</div>
+    <div><span style="background-color: #fb6a4a"></span>1,000</div>
+    <div><span style="background-color: #fc9272"></span>500</div>
+    <div><span style="background-color: #fcbba1"></span>100</div>
+    <div><span style="background-color: #fee0d2"></span>50</div>
+    <div><span style="background-color: #fff5f0"></span>0</div>
+  </div>
+  <div id="county-confirmed-legend" class="legend" style="display: none;">
+    <h4>Confirmed</h4>
+    <div><span style="background-color: #084594"></span>50,000</div>
+    <div><span style="background-color: #2171b5"></span>25,000</div>
+    <div><span style="background-color: #4292c6"></span>10,000</div>
+    <div><span style="background-color: #6baed6"></span>5,000</div>
+    <div><span style="background-color: #9ecae1"></span>1,000</div>
+    <div><span style="background-color: #c6dbef"></span>500</div>
+    <div><span style="background-color: #deebf7"></span>100</div>
+    <div><span style="background-color: #f7fbff"></span>0</div>
+  </div>
+  <!-- Javascript Imports -->
+  <script src="js/setup_new.js"></script>
+</body>
+
+</html>
